@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>딜리래빗 반송장 검색</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+      width: 100%;
+    }
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+      padding-top: 20px;
+    }
+    .header h1 {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 10px;
+    }
+    .header p {
+      font-size: 17px;
+      font-weight: 700;
+      opacity: 0.95;
+    }
+    .search-box {
+      background: white;
+      border-radius: 16px;
+      padding: 26px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+    }
+    .input-group {
+      display: flex;
+      gap: 12px;
+    }
+    #phoneInput {
+      flex: 1;
+      padding: 18px 16px;
+      border: 2px solid #E0E0E0;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      transition: all 0.3s;
+    }
+    #phoneInput:focus {
+      outline: none;
+      border-color: #667EEA;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    #searchButton {
+      padding: 18px 32px;
+      background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s;
+      white-space: nowrap;
+    }
+    #searchButton:hover {
+      transform: translateY(-2px);
+    }
+    #searchButton:active {
+      transform: translateY(0);
+    }
+    #searchButton:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .results-container {
+      flex: 1;
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+      overflow-y: auto;
+    }
+    .result-item {
+      background: #F8F9FF;
+      border-left: 5px solid #667EEA;
+      padding: 24px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+      transition: transform 0.2s;
+    }
+    .result-item:hover {
+      transform: translateX(4px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+    }
+    .result-item:last-child {
+      margin-bottom: 0;
+    }
+    .result-numbers {
+      background: white;
+      padding: 18px;
+      border-radius: 10px;
+      font-size: 18px;
+      line-height: 2;
+      word-break: break-all;
+    }
+    .result-numbers div {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+    .result-numbers strong {
+      color: #667EEA;
+      min-width: 90px;
+      font-weight: 800;
+      font-size: 19px;
+    }
+    .number-value {
+      flex: 1;
+      color: #1A1A1A;
+      font-family: 'Courier New', 'Consolas', monospace;
+      font-weight: 700;
+      font-size: 17px;
+      letter-spacing: 0.3px;
+    }
+    .divider {
+      color: #667EEA;
+      margin: 0 6px;
+      font-weight: 800;
+      font-size: 20px;
+    }
+    .no-results {
+      text-align: center;
+      padding: 60px 20px;
+      color: #666;
+    }
+    .no-results-icon {
+      font-size: 72px;
+      margin-bottom: 20px;
+    }
+    .no-results p {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.6;
+      color: #555;
+    }
+    .loading {
+      text-align: center;
+      padding: 50px;
+      color: #667EEA;
+      font-size: 19px;
+      font-weight: 700;
+    }
+    .error {
+      background: #FFF3F3;
+      border-left: 5px solid #FF4444;
+      color: #CC0000;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 10px;
+      font-size: 17px;
+      font-weight: 700;
+    }
+    @media (max-width: 480px) {
+      .container {
+        padding: 16px;
+      }
+      .header h1 {
+        font-size: 28px;
+      }
+      .header p {
+        font-size: 16px;
+      }
+      .search-box {
+        padding: 22px;
+      }
+      .input-group {
+        flex-direction: column;
+      }
+      #phoneInput {
+        font-size: 17px;
+        padding: 16px;
+      }
+      #searchButton {
+        width: 100%;
+        font-size: 17px;
+      }
+      .result-item {
+        padding: 20px;
+      }
+      .result-numbers {
+        padding: 16px;
+        font-size: 17px;
+      }
+      .result-numbers strong {
+        font-size: 18px;
+        min-width: auto;
+      }
+      .number-value {
+        font-size: 16px;
+        font-weight: 700;
+      }
+      .result-numbers div {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+      .divider {
+        display: none;
+      }
+      .number-value {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>:토끼: 딜리래빗 반송장 검색</h1>
+      <p>연락처를 입력하여 반송장번호를 조회하세요</p>
+    </div>
+    <div class="search-box">
+      <div class="input-group">
+        <input
+          type="tel"
+          id="phoneInput"
+          placeholder="연락처 입력 (예: 010-1234-5678)"
+          autocomplete="tel"
+        >
+        <button id="searchButton" onclick="searchTracking()">검색</button>
+      </div>
+    </div>
+    <div class="results-container" id="results">
+      <div class="no-results">
+        <div class="no-results-icon">:포장:</div>
+        <p>연락처를 입력하고<br>검색 버튼을 눌러주세요</p>
+      </div>
+    </div>
+  </div>
+  <script>
+    // :경고: 여기에 Apps Script Web App URL을 입력하세요
+    const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/delivus.co.kr/s/AKfycbwYxm7XLsukEjIL60VekycuMLZp9GKaU9tvIEYdW2BZFjuA2Wk4g11TyboLqdsEOnPafA/exec';
+    // Enter 키로 검색
+    document.getElementById('phoneInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        searchTracking();
+      }
+    });
+    async function searchTracking() {
+      const phoneNumber = document.getElementById('phoneInput').value.trim();
+      const resultsDiv = document.getElementById('results');
+      const searchButton = document.getElementById('searchButton');
+      if (!phoneNumber) {
+        resultsDiv.innerHTML = '<div class="error">연락처를 입력해주세요.</div>';
+        return;
+      }
+      // 로딩 표시
+      resultsDiv.innerHTML = '<div class="loading">:돋보기: 검색 중...</div>';
+      searchButton.disabled = true;
+      try {
+        // Apps Script Web App 호출
+        const url = APPS_SCRIPT_URL + '?phone=' + encodeURIComponent(phoneNumber);
+        const response = await fetch(url, {
+          method: 'GET',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (data.error) {
+          throw new Error(data.error);
+        }
+        displayResults(data.results || []);
+      } catch (error) {
+        console.error('검색 오류:', error);
+        displayError(error);
+      } finally {
+        searchButton.disabled = false;
+      }
+    }
+    function displayResults(results) {
+      const resultsDiv = document.getElementById('results');
+      if (!results || results.length === 0) {
+        resultsDiv.innerHTML = `
+          <div class="no-results">
+            <div class="no-results-icon">:혼란스러운:</div>
+            <p>검색 결과가 없습니다.<br>연락처를 다시 확인해주세요.</p>
+          </div>
+        `;
+        return;
+      }
+      let html = '';
+      results.forEach((result) => {
+        const trackingNumber = result.trackingNumber || '-';
+        const identificationNumber = result.identificationNumber || '-';
+        html += `
+          <div class="result-item">
+            <div class="result-numbers">
+              <div>
+                <strong>송장번호</strong>
+                <span class="number-value">${trackingNumber}</span>
+                <span class="divider">|</span>
+                <span class="number-value">${identificationNumber}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+      resultsDiv.innerHTML = html;
+    }
+    function displayError(error) {
+      const resultsDiv = document.getElementById('results');
+      resultsDiv.innerHTML = `
+        <div class="error">
+          <strong>오류 발생</strong><br>
+          ${error.message || '검색 중 오류가 발생했습니다.'}
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
